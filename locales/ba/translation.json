@@ -1,0 +1,10 @@
+{
+    "const username_null": "Username null hote pare na",
+    "const username_size": "Maximum 32 abong minimum 4 te character hoa dorkar",
+    "const email_null": "E-mail null hote pare no",
+    "const email_invalid": "E-mail valid noe",
+    "const password_null": "Password null hote pare na",
+    "const password_size": "Password ontoto 6 cheracter ar hote hobe",
+    "const password_pattern": "Password a obbosoi 1 ti uppercase, 1 ti lowercase, 1 ti number hoa dorkar",
+    "const email_inuse": "E-mail ti ageo use hoe che"
+}
