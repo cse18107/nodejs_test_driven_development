@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('./User');
 const UserService = require('./UserService');
 const { check, validationResult } = require('express-validator');
+const InvalidTokenException = require('./InvalidTokenException');
 
 router.post(
   '/users',
@@ -49,5 +50,18 @@ router.post(
     }
   }
 );
+
+router.post('/users/token/:token', async (req, res, next) => {
+  const token = req.params.token;
+  try {
+    await UserService.activate(token);
+    return res.send();
+  } catch (err) {
+    // return res.status(400).send();
+    next(err);
+  }
+
+
+});
 
 module.exports = router;
