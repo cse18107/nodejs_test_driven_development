@@ -31,7 +31,7 @@ const findByEmail = async (email) => {
 
 const activate = async (token) => {
   const user = await User.findOne({ where: { activationToken: token } });
-  if(!user){
+  if (!user) {
     throw new InvalidTokenException();
   }
   user.inActive = false;
@@ -39,4 +39,21 @@ const activate = async (token) => {
   await user.save();
 };
 
-module.exports = { save, findByEmail, activate };
+const getUsers = async (page, size) => {
+
+  const usersWithCount = await User.findAndCountAll({
+    where: { inActive: false },
+    attributes: ['id', 'username', 'email'],
+    limit: size,
+    offset: page * size,
+  });
+
+  return {
+    content: usersWithCount.rows,
+    page,
+    size,
+    totalPages: Math.ceil(usersWithCount.count / size),
+  };
+};
+
+module.exports = { save, findByEmail, activate, getUsers };

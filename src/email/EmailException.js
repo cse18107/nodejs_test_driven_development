@@ -1,4 +1,5 @@
-module.exports = function InvalidTokenException() {
+
+module.exports = function EmailException() {
   this.message = 'Email Failure';
-  this.status = 502;
+  this.status = 400;
 };

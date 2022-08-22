@@ -1,0 +1,1 @@
+https://eloquentcode.com/expect-a-function-to-throw-an-exception-in-jest

@@ -4,6 +4,8 @@ const User = require('./User');
 const UserService = require('./UserService');
 const { check, validationResult } = require('express-validator');
 const InvalidTokenException = require('./InvalidTokenException');
+const ValidationException = require('../error/validationException');
+const pagination = require('../middleware/pagination');
 
 router.post(
   '/users',
@@ -35,18 +37,17 @@ router.post(
     .bail()
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/)
     .withMessage('password_pattern'),
-  async (req, res) => {
+  async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const validationErrors = {};
-      errors.array().forEach((error) => (validationErrors[error.param] = req.t(error.msg)));
-      return res.status(400).send({ validationErrors });
+      return next(new ValidationException(errors.array()));
     }
     try {
       await UserService.save(req.body);
       return res.send({ message: 'User created' });
     } catch (error) {
-      return res.status(502).send({ message: error.message });
+      // return res.status(502).send({ message: error.message });
+      next(error);
     }
   }
 );
@@ -57,11 +58,14 @@ router.post('/users/token/:token', async (req, res, next) => {
     await UserService.activate(token);
     return res.send();
   } catch (err) {
-    // return res.status(400).send();
     next(err);
   }
+});
 
-
+router.get('/users', pagination, async (req, res) => {
+  const { size, page } = req.pagination;
+  const users = await UserService.getUsers(page, size);
+  res.send(users);
 });
 
 module.exports = router;
