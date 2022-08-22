@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const User = require('./User');
 const UserService = require('./UserService');
 const { check, validationResult } = require('express-validator');
-const InvalidTokenException = require('./InvalidTokenException');
 const ValidationException = require('../error/validationException');
 const pagination = require('../middleware/pagination');
 
@@ -66,6 +64,15 @@ router.get('/users', pagination, async (req, res) => {
   const { size, page } = req.pagination;
   const users = await UserService.getUsers(page, size);
   res.send(users);
+});
+
+router.get('/users/:id', async (req, res, next) => {
+  try {
+    const user = await UserService.getUser(req.params.id);
+    res.send(user);
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = router;
