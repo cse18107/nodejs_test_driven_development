@@ -4,6 +4,8 @@ const UserService = require('./UserService');
 const { check, validationResult } = require('express-validator');
 const ValidationException = require('../error/validationException');
 const pagination = require('../middleware/pagination');
+const ForbiddenException = require('../error/ForbiddenException');
+const basicAuthentication = require('../middleware/basicAuthentication');
 
 router.post(
   '/users',
@@ -60,9 +62,10 @@ router.post('/users/token/:token', async (req, res, next) => {
   }
 });
 
-router.get('/users', pagination, async (req, res) => {
+router.get('/users', pagination, basicAuthentication, async (req, res) => {
+  const authenticatedUser = req.authenticatedUser;
   const { size, page } = req.pagination;
-  const users = await UserService.getUsers(page, size);
+  const users = await UserService.getUsers(page, size, authenticatedUser);
   res.send(users);
 });
 
@@ -73,6 +76,17 @@ router.get('/users/:id', async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+router.put('/users/:id', basicAuthentication, async (req, res, next) => {
+  const authenticatedUser = req.authenticatedUser;
+
+  if(!authenticatedUser || authenticatedUser.id != req.params.id) {
+    return next(new ForbiddenException('You are not authorized to update user1'));
+  }
+
+  await UserService.updateUser(req.params.id, req.body);
+  return res.send();
 });
 
 module.exports = router;

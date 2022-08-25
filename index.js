@@ -1,14 +1,16 @@
 const app = require('./src/app');
 const sequelize = require('./src/config/database');
-
+const bcrypt = require('bcrypt');
 const User = require('./src/user/User');
 
 const addUsers = async (activeUserCount, inactiveUserCount = 0) => {
+  const hash = await bcrypt.hash('P4ssword', 10);
   for (let i = 0; i < activeUserCount + inactiveUserCount; i++) {
     await User.create({
       username: `user${i + 1}`,
       email: `user${i + 1}@gmail.com`,
       inActive: i >= activeUserCount,
+      password: hash,
     });
   }
 };
